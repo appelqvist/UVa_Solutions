@@ -13,7 +13,7 @@
 
 -
 
-###[_] [UVa_839](https://uva.onlinejudge.org/external/8/839.pdf) - Not so Mobile
+###[X] [UVa_839](https://uva.onlinejudge.org/external/8/839.pdf) - Not so Mobile
 
 -
 
