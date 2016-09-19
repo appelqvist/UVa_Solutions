@@ -37,32 +37,31 @@ public class BT {
 
     private int getWeightLeft() {
         if (weightLeft == 0) {
-            leftSubTree.getTotalWeight();
+            return leftSubTree.getTotalWeight();
         } else {
             return weightLeft;
         }
-        return -1;
     }
 
     private int getWeightRight() {
         if (weightRight == 0) {
-            rightSubTree.getTotalWeight();
+            return rightSubTree.getTotalWeight();
         } else {
             return weightRight;
         }
-        return -1;
     }
 
     public int getTotalWeight() {
         return getWeightRight() + getWeightLeft();
     }
 
+
     public boolean equilibrium() {
         if (weightRight == 0 && weightLeft == 0) { //It's subtree(s) to both right aswell as the left
             if (!leftSubTree.equilibrium() || !rightSubTree.equilibrium()) {
                 return false;
             } else {
-                return ((getWeightLeft() * distanceLeft) == (getWeightRight() * distanceLeft));
+                return (getWeightLeft() * distanceLeft) == (getWeightRight() * distanceRight);
             }
         } else if (weightRight == 0) {// Subtree to the right
             if (rightSubTree.equilibrium()) {
