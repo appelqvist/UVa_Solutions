@@ -17,7 +17,7 @@
 
 -
 
-###[_] [UVa_10608](https://uva.onlinejudge.org/external/106/10608.pdf) - Friends
+###[X] [UVa_10608](https://uva.onlinejudge.org/external/106/10608.pdf) - Friends
 
 -
 
@@ -25,15 +25,15 @@
 
 -
 
-###[_] [UVa_374](https://uva.onlinejudge.org/external/3/374.pdf) - Big Mod
+###[X] [UVa_374](https://uva.onlinejudge.org/external/3/374.pdf) - Big Mod
 
 -
 
-###[_] [UVa_11054](https://uva.onlinejudge.org/external/110/11054.pdf) - Wine trading in Gergovia
+###[X] [UVa_11054](https://uva.onlinejudge.org/external/110/11054.pdf) - Wine trading in Gergovia
 
 -
 
-###[_] [UVa_10340](https://uva.onlinejudge.org/external/103/10340.pdf) - All in All
+###[X] [UVa_10340](https://uva.onlinejudge.org/external/103/10340.pdf) - All in All
 
 -
 
