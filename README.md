@@ -37,7 +37,7 @@
 
 -
 
-###[_] [UVa_10943](https://uva.onlinejudge.org/external/109/10943.pdf) - How do you add?
+###[X] [UVa_10943](https://uva.onlinejudge.org/external/109/10943.pdf) - How do you add?
 
 -
 
