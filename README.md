@@ -41,7 +41,7 @@
 
 -
 
-###[_] [UVa_116](https://uva.onlinejudge.org/external/1/116.pdf) - Unidirectional TSP
+###[X] [UVa_116](https://uva.onlinejudge.org/external/1/116.pdf) - Unidirectional TSP
 
 -
 
