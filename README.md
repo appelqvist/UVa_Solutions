@@ -45,11 +45,11 @@
 
 -
 
-###[_] [UVa_185](https://uva.onlinejudge.org/external/1/185.pdf) - Roman Numerals
+###[X] [UVa_185](https://uva.onlinejudge.org/external/1/185.pdf) - Roman Numerals
 
 -
 
-###[_] [UVa_920](https://uva.onlinejudge.org/external/9/920.pdf) - Sunny Mountains
+###[X] [UVa_920](https://uva.onlinejudge.org/external/9/920.pdf) - Sunny Mountains
 
 -
 
