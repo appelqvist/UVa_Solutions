@@ -10,7 +10,7 @@ import java.util.Scanner;
  */
 public class Main {
     public static void main(String[] args) throws FileNotFoundException {new Main();}
-    
+
     private Node[][] nodes;
     public Main() throws FileNotFoundException {
         //Scanner sc = new Scanner(System.in);
