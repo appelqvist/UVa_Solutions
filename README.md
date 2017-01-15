@@ -53,7 +53,7 @@
 
 -
 
-###[_] [UVa_10078](https://uva.onlinejudge.org/external/100/10078.pdf) - The Art Gallery
+###[X] [UVa_10078](https://uva.onlinejudge.org/external/100/10078.pdf) - The Art Gallery
 
 -
 
