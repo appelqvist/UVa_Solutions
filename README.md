@@ -57,7 +57,7 @@
 
 -
 
-###[_] [UVa_10245](https://uva.onlinejudge.org/external/102/10245.pdf) - The Closest Pair Problem
+###[X] [UVa_10245](https://uva.onlinejudge.org/external/102/10245.pdf) - The Closest Pair Problem
 
 -
 
