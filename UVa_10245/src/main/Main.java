@@ -12,8 +12,8 @@ public class Main {
     public static void main(String[] args) throws IOException { new Main().go(); }
 
     public void go() throws IOException {
-        //BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
-        BufferedReader in = new BufferedReader(new InputStreamReader(new FileInputStream("src/sample_input")));
+        BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
+        //BufferedReader in = new BufferedReader(new InputStreamReader(new FileInputStream("src/sample_input")));
 
         while (true) {
             int pairs = Integer.parseInt(in.readLine());
@@ -23,20 +23,25 @@ public class Main {
             double x,y;
             Point[] points = new Point[pairs];
             for(int i = 0; i < pairs; i++){
-                String[] row = in.readLine().split(" ");
-                x = Double.parseDouble(row[0]);
-                y = Double.parseDouble(row[1]);
+                //String[] row = in.readLine().split(" ");
+                //x = Double.parseDouble(row[0]);
+                //y = Double.parseDouble(row[1]);
+
+                StringTokenizer tokenizer = new StringTokenizer(in.readLine());
+                x = Double.parseDouble(tokenizer.nextToken());      //Tokenizer is cheaper then split into str[]
+                y = Double.parseDouble(tokenizer.nextToken());
                 points[i] = new Point(x,y);
             }
 
-            double distance = sweepline(points);
+            double distance = bruteforce(points);
+            distance = Math.pow(distance, 0.5);
             print(distance);
 
         }
     }
 
     private double bruteforce(Point[] points){
-        double minDist = 40000;
+        double minDist = Double.MAX_VALUE;
 
         for (Point p1 : points) {
             for (Point p2 : points) {
@@ -63,6 +68,9 @@ public class Main {
         }
     }
 
+    /**
+     * Sweepline metod to solve the problem. Got an runtime error when run in UVa.
+     */
     public double sweepline(Point[] points){
         double minDistance = 40000;
         Arrays.sort(points, X_COMPARATOR);
@@ -98,7 +106,7 @@ public class Main {
         double dy = Math.pow((p1.y - p2.y), 2);
 
         double res = dx + dy;
-        res = Math.pow(res, 0.5);
+        //res = Math.pow(res, 0.5);  This was to expensive doing this once with the result that is going to print.
         return res;
     }
 
