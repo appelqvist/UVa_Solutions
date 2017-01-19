@@ -1,7 +1,10 @@
 package main;
 
+import javafx.collections.transformation.SortedList;
+
 import java.io.*;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.PriorityQueue;
 
 /**
@@ -16,6 +19,7 @@ public class Main {
     private Node[][] maze;
     private Node start;
     private ArrayList<Node> allAlliens = new ArrayList<>();
+    private ArrayList<Edge> allEdges = new ArrayList<>();
 
     public static void main(String[] args) throws IOException {
         new Main().program();
@@ -32,7 +36,7 @@ public class Main {
             String[] splitted = input.split(" ");
             col = Integer.parseInt(splitted[0]);
             row = Integer.parseInt(splitted[1]);
-            System.out.println("cols: " + col + ", rows: " + row);
+            //System.out.println("cols: " + col + ", rows: " + row);
             maze = new Node[row][col];
             Node n;
             for (int j = 0; j < maze.length; j++) {
@@ -75,15 +79,35 @@ public class Main {
                 }
             }
 
+            /*
             for (int j = 0; j < maze.length; j++) {
                 for (int k = 0; k < maze[j].length; k++) {
                     System.out.print(maze[j][k] + " ");
                 }
                 System.out.println();
             }
+            */
 
             runBFS();
+            Collections.sort(allEdges);
+            //System.out.println(allEdges);
+            solveWithKruskals();
         }
+    }
+
+    private void solveWithKruskals(){
+        int all = allAlliens.size()-1;
+        int val = 0;
+        while(all > 0){
+            ArrayList<Node> nodesinMST = new ArrayList<>();
+            Edge e = allEdges.remove(allEdges.size()-1);
+            if(e.to.root != e.from.root){
+                e.to.root = e.from.root;
+                val += e.value;
+                all--;
+            }
+        }
+        System.out.println(val);
     }
 
     private void runBFS() {
@@ -92,7 +116,6 @@ public class Main {
         PriorityQueue<NodeCost> Q = new PriorityQueue<>();
         for(int i = 0; i < allAlliens.size(); i++){
             Node begin = allAlliens.get(i);
-            System.out.println("ny: "+begin);
             Q.offer(new NodeCost(begin,0));
             boolean firstRound = true;
             while(!Q.isEmpty()){
@@ -100,10 +123,10 @@ public class Main {
                 int currentCost = nc.cost;
                 Node node = nc.n;
                 node.visited *= -1;
-
                 if (!firstRound && (node.type == Enum.ALIEN || node.type == Enum.START)){
                     node.totalCost = currentCost;
-                    System.out.println("from: "+begin+", to:"+node+", cost:"+node.totalCost);
+                    //System.out.println("from: "+begin+", to:"+node+", cost:"+node.totalCost);
+                    allEdges.add(new Edge(begin, node, currentCost));
                 }
 
                 for(int j = 0; j < node.neighbors.size(); j++){
@@ -117,18 +140,30 @@ public class Main {
         }
     }
 
-    public class NodeCost implements Comparable<NodeCost>{
-        Node n;
-        int cost;
-        public NodeCost(Node n, int cost){this.n = n; this.cost = cost;}
+    public class Edge implements Comparable<Edge>{
+        int value;
+        Node from;
+        Node to;
+
+        public Edge(Node from, Node to, int value){
+            this.from = from;
+            this.to = to;
+            this.value = value;
+        }
 
         @Override
-        public int compareTo(NodeCost o) {
-            return cost - o.cost;
+        public int compareTo(Edge e) {
+            return e.value - value;
+        }
+
+        @Override
+        public String toString() {
+            return "[F:"+from+"T:"+to+"V:"+value+"]";
         }
     }
 
     public class Node{
+        Node root = this;
         Enum type;
         int totalCost;
         ArrayList<Node> neighbors = new ArrayList<>();
@@ -145,4 +180,14 @@ public class Main {
         }
     }
 
+    public class NodeCost implements Comparable<NodeCost>{
+        Node n;
+        int cost;
+        public NodeCost(Node n, int cost){this.n = n; this.cost = cost;}
+
+        @Override
+        public int compareTo(NodeCost o) {
+            return cost - o.cost;
+        }
+    }
 }
