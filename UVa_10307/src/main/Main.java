@@ -36,12 +36,14 @@ public class Main {
             input = br.readLine();
             mazeWidth = Integer.parseInt(input.split(" ")[0]);
             mazeHeight = Integer.parseInt(input.split(" ")[1]);
+
             maze = new Node[mazeHeight][mazeWidth];
             char c;
             Stack<Node> aliens = new Stack<>();
             ArrayList<Node> allNodes = new ArrayList<>();
             Node start = null;
             Node n;
+
             for (int j = 0; j < maze.length; j++) {
                 char[] inputrow = br.readLine().toCharArray();
                 for (int k = 0; k < maze[j].length; k++) {
@@ -98,11 +100,12 @@ public class Main {
                             n1.visited = false;
                             n1.level = 0;
                         }
-                        Queue<Node> queue = new LinkedList<>();
+                        LinkedList<Node> queue = new LinkedList<>();
                         queue.add(from);
                         from.visited = true;
                         while (!queue.isEmpty()) {
-                            Node node = queue.remove();
+                            //System.out.println(queue);
+                            Node node = queue.removeFirst();
                             if (node == to) {
                                 edges.add(new Edge(from, to, node.level));
                                 //System.out.println("From: " + from + " to: " + to + " costs:" + node.level);
@@ -111,7 +114,8 @@ public class Main {
                             for (Node neighbour : node.neighbours) {
                                 if (!neighbour.visited) {
                                     neighbour.level = node.level + 1;
-                                    queue.add(neighbour);
+                                    neighbour.visited = true;
+                                    queue.addLast(neighbour);
                                 }
                             }
                         }
@@ -122,12 +126,14 @@ public class Main {
             //Kruskals alogritm to find MST.
             ArrayList<Edge> MST = new ArrayList<>();
             Collections.sort(edges);
+            for(Edge e : edges){
+                System.out.println(e);
+            }
             int totalWeight = 0;
             for (Edge e : edges) {
-                if (MST.size() == allAliens.length - 1) {
+                if (MST.size() == allAliens.length-1) {
                     break;
                 }
-                ArrayList<Node> nodesinMST = new ArrayList<>();
                 if (e.to.root != e.from.root) {
                     e.to.root = e.from.root;
                     totalWeight += e.weight;
@@ -137,6 +143,8 @@ public class Main {
             System.out.println(totalWeight);
         }
     }
+
+
 
     private class Edge implements Comparable<Edge> {
         public int weight;
@@ -188,7 +196,8 @@ public class Main {
 
         @Override
         public String toString() {
-            return "[" + mazeIndex[0] + ", " + mazeIndex[1] + "]";
+            //return "[" + mazeIndex[0] + ", " + mazeIndex[1] + "]";
+            return "["+type.toString().charAt(0)+"] ";
         }
     }
 }
