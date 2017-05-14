@@ -1,193 +1,194 @@
 package main;
 
-import javafx.collections.transformation.SortedList;
-
-import java.io.*;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.PriorityQueue;
+import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.*;
 
 /**
- * Created by Andréas Appelqvist on 2017-01-17.
+ * Created by Andréas Appelqvist on 5/14/17.
  */
 public class Main {
 
-    public enum Enum {
+    public enum type {
         WALL, FLOOR, ALIEN, START
     }
 
-    private Node[][] maze;
-    private Node start;
-    private ArrayList<Node> allAlliens = new ArrayList<>();
-    private ArrayList<Edge> allEdges = new ArrayList<>();
-
-    public static void main(String[] args) throws IOException {
-        new Main().program();
+    public static void main(String[] args) {
+        try {
+            new Main().program();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
-    public void program() throws IOException {
-        //BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
+    private void program() throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream("src/sample_input")));
+        //BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         String input = br.readLine();
-        int testcases = Integer.parseInt(input);
-        for (int i = 0; i < testcases; i++) {
-            int col, row;
+        int testCases = Integer.parseInt(input);
+        int mazeWidth;
+        int mazeHeight;
+        Node[][] maze;
+        for (int i = 0; i < testCases; i++) {
+            //Building the maze
             input = br.readLine();
-            String[] splitted = input.split(" ");
-            col = Integer.parseInt(splitted[0]);
-            row = Integer.parseInt(splitted[1]);
-            //System.out.println("cols: " + col + ", rows: " + row);
-            maze = new Node[row][col];
+            mazeWidth = Integer.parseInt(input.split(" ")[0]);
+            mazeHeight = Integer.parseInt(input.split(" ")[1]);
+            maze = new Node[mazeHeight][mazeWidth];
+            char c;
+            Stack<Node> aliens = new Stack<>();
+            ArrayList<Node> allNodes = new ArrayList<>();
+            Node start = null;
             Node n;
             for (int j = 0; j < maze.length; j++) {
                 char[] inputrow = br.readLine().toCharArray();
                 for (int k = 0; k < maze[j].length; k++) {
-                    n = new Node(Enum.WALL);
-                    n.mazeIndex = new int[]{j, k};
+                    n = new Node(type.WALL, j, k);
                     if (k < inputrow.length) {
-                        char c = inputrow[k];
+                        c = inputrow[k];
                         if (c == 'A') {
-                            n.type = Enum.ALIEN;
-                            allAlliens.add(n);
+                            n.type = type.ALIEN;
+                            aliens.push(n);
                         } else if (c == 'S') {
-                            n.type = Enum.START;
+                            n.type = type.START;
                             start = n;
                         } else if (c == ' ') {
-                            n.type = Enum.FLOOR;
+                            n.type = type.FLOOR;
                         }
                     }
+                    allNodes.add(n);
                     maze[j][k] = n;
                 }
             }
 
-            for (int j = 1; j < maze.length - 1; j++) {
-                for (int k = 1; k < maze[j].length - 1; k++) {
-                    if (maze[j][k].type != Enum.WALL) { //If current node isnt a wall
-                        if (maze[j - 1][k].type != Enum.WALL) { //Look up and if it is a not wall there make neighbor.
-                            maze[j][k].neighbors.add(maze[j - 1][k]);
+            //Construct a graph
+            //Nodes with neighbours
+            for (int k = 0; k < maze.length; k++) {
+                for (int l = 0; l < maze[k].length; l++) {
+                    n = maze[k][l];
+                    if (n.type != type.WALL) {
+                        //Look up if not wall
+                        if (k - 1 >= 0 && maze[k - 1][l].type != type.WALL) {
+                            makeNeighbours(n, maze[k - 1][l]);
                         }
-                        if (maze[j][k + 1].type != Enum.WALL) { //Look left
-                            maze[j][k].neighbors.add(maze[j][k + 1]);
-                        }
-                        if (maze[j][k - 1].type != Enum.WALL) { //Look right
-                            maze[j][k].neighbors.add(maze[j][k - 1]);
-                        }
-                        if (maze[j + 1][k].type != Enum.WALL) { //Look down
-                            maze[j][k].neighbors.add(maze[j + 1][k]);
+                        //Look left if not wall
+                        if (l - 1 >= 0 && maze[k][l - 1].type != type.WALL) {
+                            makeNeighbours(n, maze[k][l - 1]);
                         }
                     }
                 }
             }
 
-            /*
-            for (int j = 0; j < maze.length; j++) {
-                for (int k = 0; k < maze[j].length; k++) {
-                    System.out.print(maze[j][k] + " ");
-                }
-                System.out.println();
+            //See start position as a alien.
+            Node[] allAliens = new Node[aliens.size() + 1];
+            allAliens[0] = start;
+            for (int j = 1; j < allAliens.length; j++) {
+                allAliens[j] = aliens.pop();
             }
-            */
 
-            runBFS();
-            Collections.sort(allEdges);
-            //System.out.println(allEdges);
-            solveWithKruskals();
-        }
-    }
-
-    private void solveWithKruskals(){
-        int all = allAlliens.size()-1;
-        int val = 0;
-        while(all > 0){
-            ArrayList<Node> nodesinMST = new ArrayList<>();
-            Edge e = allEdges.remove(allEdges.size()-1);
-            if(e.to.root != e.from.root){
-                e.to.root = e.from.root;
-                val += e.value;
-                all--;
-            }
-        }
-        System.out.println(val);
-    }
-
-    private void runBFS() {
-        allAlliens.add(start);
-        int reverser = 1; //So i dont need to loop and set all unvisited.
-        PriorityQueue<NodeCost> Q = new PriorityQueue<>();
-        for(int i = 0; i < allAlliens.size(); i++){
-            Node begin = allAlliens.get(i);
-            Q.offer(new NodeCost(begin,0));
-            boolean firstRound = true;
-            while(!Q.isEmpty()){
-                NodeCost nc = Q.poll();
-                int currentCost = nc.cost;
-                Node node = nc.n;
-                node.visited *= -1;
-                if (!firstRound && (node.type == Enum.ALIEN || node.type == Enum.START)){
-                    node.totalCost = currentCost;
-                    //System.out.println("from: "+begin+", to:"+node+", cost:"+node.totalCost);
-                    allEdges.add(new Edge(begin, node, currentCost));
-                }
-
-                for(int j = 0; j < node.neighbors.size(); j++){
-                    if(node.neighbors.get(j).visited * reverser < 0){
-                        Q.offer(new NodeCost(node.neighbors.get(j), currentCost+1));
+            ArrayList<Edge> edges = new ArrayList<>();
+            //BFS for every alien and start in the graph.
+            //Put them in a list.
+            for (Node from : allAliens) {
+                for (Node to : allAliens) {
+                    if (from != to) {
+                        for (Node n1 : allNodes) {       //Set all nodes as unvisited
+                            n1.visited = false;
+                            n1.level = 0;
+                        }
+                        Queue<Node> queue = new LinkedList<>();
+                        queue.add(from);
+                        from.visited = true;
+                        while (!queue.isEmpty()) {
+                            Node node = queue.remove();
+                            if (node == to) {
+                                edges.add(new Edge(from, to, node.level));
+                                //System.out.println("From: " + from + " to: " + to + " costs:" + node.level);
+                                break;
+                            }
+                            for (Node neighbour : node.neighbours) {
+                                if (!neighbour.visited) {
+                                    neighbour.level = node.level + 1;
+                                    queue.add(neighbour);
+                                }
+                            }
+                        }
                     }
                 }
-                firstRound = false;
             }
-        reverser *= -1;
+
+            //Kruskals alogritm to find MST.
+            ArrayList<Edge> MST = new ArrayList<>();
+            Collections.sort(edges);
+            int totalWeight = 0;
+            for (Edge e : edges) {
+                if (MST.size() == allAliens.length - 1) {
+                    break;
+                }
+                ArrayList<Node> nodesinMST = new ArrayList<>();
+                if (e.to.root != e.from.root) {
+                    e.to.root = e.from.root;
+                    totalWeight += e.weight;
+                    MST.add(e);
+                }
+            }
+            System.out.println(totalWeight);
         }
     }
 
-    public class Edge implements Comparable<Edge>{
-        int value;
-        Node from;
-        Node to;
+    private class Edge implements Comparable<Edge> {
+        public int weight;
+        public Node from;
+        public Node to;
 
-        public Edge(Node from, Node to, int value){
+        public Edge(Node from, Node to, int weight) {
+            this.weight = weight;
             this.from = from;
             this.to = to;
-            this.value = value;
         }
 
         @Override
-        public int compareTo(Edge e) {
-            return e.value - value;
+        public int compareTo(Edge edge) {
+            return this.weight - edge.weight;
         }
 
-        @Override
         public String toString() {
-            return "[F:"+from+"T:"+to+"V:"+value+"]";
+            return "from: " + from + " to: " + to + " costs:" + weight;
         }
     }
 
-    public class Node{
-        Node root = this;
-        Enum type;
-        int totalCost;
-        ArrayList<Node> neighbors = new ArrayList<>();
-        int visited = -1; //1 yes, -1 no
-        int[] mazeIndex = new int[2];
+    public void makeNeighbours(Node n, Node m) {
+        n.addNeighbours(m);
+        m.addNeighbours(n);
+    }
 
-        public Node(Enum type) {
+    private class Node {
+        public type type;
+        public LinkedList<Node> neighbours;
+        public boolean visited;
+        public int level = 0;
+        public int[] mazeIndex;
+        public Node root;
+
+        public Node(type type, int x, int y) {
             this.type = type;
+            this.neighbours = new LinkedList<>();
+            visited = false;
+            mazeIndex = new int[2];
+            mazeIndex[0] = x;
+            mazeIndex[1] = y;
+            root = this;
+        }
+
+        public void addNeighbours(Node n) {
+            neighbours.add(n);
         }
 
         @Override
         public String toString() {
-            return "[" + mazeIndex[0]+","+mazeIndex[1]+ "]";
-        }
-    }
-
-    public class NodeCost implements Comparable<NodeCost>{
-        Node n;
-        int cost;
-        public NodeCost(Node n, int cost){this.n = n; this.cost = cost;}
-
-        @Override
-        public int compareTo(NodeCost o) {
-            return cost - o.cost;
+            return "[" + mazeIndex[0] + ", " + mazeIndex[1] + "]";
         }
     }
 }
