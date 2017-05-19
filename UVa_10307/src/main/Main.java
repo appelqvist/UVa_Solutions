@@ -123,17 +123,23 @@ public class Main {
                 }
             }
 
+
+
             //Kruskals alogritm to find MST.
             ArrayList<Edge> MST = new ArrayList<>();
             Collections.sort(edges);
+
+
             for(Edge e : edges){
                 System.out.println(e);
             }
+
             int totalWeight = 0;
             for (Edge e : edges) {
                 if (MST.size() == allAliens.length-1) {
                     break;
                 }
+
                 if (e.to.root != e.from.root) {
                     e.to.root = e.from.root;
                     totalWeight += e.weight;
@@ -141,6 +147,8 @@ public class Main {
                 }
             }
             System.out.println(totalWeight);
+
+
         }
     }
 
