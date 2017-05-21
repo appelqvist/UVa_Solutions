@@ -24,8 +24,8 @@ public class Main {
     }
 
     private void program() throws IOException {
-        BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream("src/sample_input")));
-        //BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        //BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream("src/sample_input")));
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         String input = br.readLine();
         int testCases = Integer.parseInt(input);
         int mazeWidth;
@@ -86,8 +86,11 @@ public class Main {
             //See start position as a alien.
             Node[] allAliens = new Node[aliens.size() + 1];
             allAliens[0] = start;
+            if(start != null)
+                allAliens[0].pos = 0;
             for (int j = 1; j < allAliens.length; j++) {
                 allAliens[j] = aliens.pop();
+                allAliens[j].pos = j;
             }
 
             ArrayList<Edge> edges = new ArrayList<>();
@@ -123,36 +126,67 @@ public class Main {
                 }
             }
 
-
-
             //Kruskals alogritm to find MST.
-            ArrayList<Edge> MST = new ArrayList<>();
-            Collections.sort(edges);
-
-
-            for(Edge e : edges){
-                System.out.println(e);
+            LinkedList<Edge> MST = kruskalsMST(allAliens, edges);
+            int sum = 0;
+            for(Edge e : MST){
+                sum += e.weight;
             }
-
-            int totalWeight = 0;
-            for (Edge e : edges) {
-                if (MST.size() == allAliens.length-1) {
-                    break;
-                }
-
-                if (e.to.root != e.from.root) {
-                    e.to.root = e.from.root;
-                    totalWeight += e.weight;
-                    MST.add(e);
-                }
-            }
-            System.out.println(totalWeight);
-
-
+            System.out.println(sum);
         }
     }
 
 
+    public LinkedList<Edge> kruskalsMST(Node[] allAliens, ArrayList<Edge> edges){
+        LinkedList<Edge> MST = new LinkedList<>();
+        Collections.sort(edges);
+        DisjointSet disjointSet = new DisjointSet(allAliens.length);
+
+        for(Edge e : edges){
+            if(disjointSet.find(e.from.pos) != disjointSet.find(e.to.pos)){
+                disjointSet.union(e.from.pos,e.to.pos);
+                MST.add(e);
+            }
+        }
+        return MST;
+    }
+
+    private class DisjointSet{
+        private int[] parent;
+        private int n;
+
+        public DisjointSet(int n){
+            parent = new int[n];
+            this.n = n;
+            initSet();
+        }
+
+        private void initSet(){
+            for(int i = 0; i < n; i++){
+                parent[i] = i;
+            }
+        }
+
+        public int find(int x){
+            if(parent[x] != x){
+                parent[x] = find(parent[x]);
+            }
+            return parent[x];
+        }
+
+        public void union(int x, int y){
+            int xr = find(x);
+            int yr = find(y);
+
+            //Do nothing
+            if(xr == yr){
+                return;
+            }else{ //give y root x root
+                parent[yr] = xr;
+            }
+
+        }
+    }
 
     private class Edge implements Comparable<Edge> {
         public int weight;
@@ -186,7 +220,7 @@ public class Main {
         public boolean visited;
         public int level = 0;
         public int[] mazeIndex;
-        public Node root;
+        public int pos;
 
         public Node(type type, int x, int y) {
             this.type = type;
@@ -195,7 +229,6 @@ public class Main {
             mazeIndex = new int[2];
             mazeIndex[0] = x;
             mazeIndex[1] = y;
-            root = this;
         }
 
         public void addNeighbours(Node n) {
